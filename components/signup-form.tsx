@@ -51,13 +51,14 @@ export function SignUpForm({
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
+            username: "",
             email: "",
             password: "",
         },
     })
     async function onSubmit(data: z.infer<typeof formSchema>) {
         setIsLoading(true);
-        const { success, message } = await signIn(data.email, data.password);
+        const { success, message } = await signUp(data.username, data.email, data.password);
         if (success) {
             toast.success(message as String);
             router.push("/dashboard")
@@ -169,7 +170,7 @@ export function SignUpForm({
                             </Field>
                             <Field>
                                 <Button type="submit" disabled={isLoading}>
-                                    {isLoading ? <Loader2 className="animate-spin size-5" /> : "Login"}
+                                    {isLoading ? <Loader2 className="animate-spin size-5" /> : "Sign Up"}
                                 </Button>
                             </Field>
                             <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
@@ -205,7 +206,7 @@ export function SignUpForm({
                                 </Button>
                             </Field>
                             <FieldDescription className="text-center">
-                                Don&apos;t have an account? <a href="#">Sign up</a>
+                                Already have an account? <a href="/login">Login</a>
                             </FieldDescription>
                         </FieldGroup>
                     </form>
