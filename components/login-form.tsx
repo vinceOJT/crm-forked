@@ -12,18 +12,23 @@ import {
   FieldLabel,
   FieldSeparator,
 } from "@/components/ui/field"
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
+
 
 // LOGICAL DEPENDENCIES
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Controller, useForm } from "react-hook-form"
 import * as z from "zod"
+import { router } from "better-auth/api";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+
 
 //CUSTOM FUNCTIONS
 import { Input } from "@/components/ui/input"
 import { signIn, signUp } from "@/server/users"
-import { toast } from "sonner";
-import { router } from "better-auth/api";
-import { useRouter } from "next/navigation";
+
 
 
 const formSchema = z.object({
@@ -38,7 +43,7 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -48,6 +53,7 @@ export function LoginForm({
     },
   })
   async function onSubmit(data: z.infer<typeof formSchema>) {
+    setIsLoading(true);
     const { success, message } = await signIn(data.email, data.password);
     if (success) {
       toast.success(message as String);
@@ -55,7 +61,7 @@ export function LoginForm({
     } else {
       toast.error(message as String);
     }
-
+    setIsLoading(false)
   }
 
 
@@ -129,8 +135,8 @@ export function LoginForm({
                 </a>
               </Field>
               <Field>
-                <Button type="submit">
-                  Login
+                <Button type="submit" disabled={isLoading}>
+                  {isLoading ? <Loader2 className="animate-spin size-5" /> : "Login"}
                 </Button>
               </Field>
               <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
