@@ -28,10 +28,13 @@ import { useState } from "react";
 //CUSTOM FUNCTIONS
 import { Input } from "@/components/ui/input"
 import { signIn, signUp } from "@/server/users"
+import { user } from "@/db/schema";
+import { username } from "better-auth/plugins";
 
 
 
 const formSchema = z.object({
+    username: z.string().trim().min(5, { message: "Too Short For Username" }),
     email: z.string().trim().pipe(z.email({ message: "Invalid Email Input" })),
     password: z.string().min(6, { message: "Invalid Password Input" })
 })
@@ -81,7 +84,35 @@ export function SignUpForm({
                                 </p>
                             </div>
                             <Field>
-                                <FieldLabel htmlFor="email">Email</FieldLabel>
+                                <div className="flex items-center">
+                                    <FieldLabel htmlFor="username">Username</FieldLabel>
+
+                                </div>
+                                <Controller
+                                    name="username"
+                                    control={form.control}
+                                    render={({ field, fieldState }) => (
+                                        <Field data-invalid={fieldState.invalid}>
+                                            <Input
+                                                {...field}
+                                                id="form-rhf-demo-title"
+                                                aria-invalid={fieldState.invalid}
+                                                disabled={isLoading}
+                                                placeholder={isLoading ? "Verifying Username..." : "Johnny V. Hendrick"}
+                                                autoComplete="off"
+                                            />
+                                            {fieldState.invalid && (
+                                                <FieldError errors={[fieldState.error]} />
+                                            )}
+                                        </Field>
+                                    )}
+                                />
+                            </Field>
+                            <Field>
+                                <div className="flex items-center">
+                                    <FieldLabel htmlFor="email">Email</FieldLabel>
+
+                                </div>
                                 <Controller
                                     name="email"
                                     control={form.control}
@@ -105,7 +136,7 @@ export function SignUpForm({
                             </Field>
                             <Field>
                                 <div className="flex items-center">
-                                    <FieldLabel htmlFor="email">Password</FieldLabel>
+                                    <FieldLabel htmlFor="password">Password</FieldLabel>
 
                                 </div>
                                 <Controller
