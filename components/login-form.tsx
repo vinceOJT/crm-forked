@@ -1,29 +1,69 @@
 "use client";
 
+// COMPONENTS/BLCOKS
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import {
   Field,
   FieldDescription,
+  FieldError,
   FieldGroup,
   FieldLabel,
   FieldSeparator,
 } from "@/components/ui/field"
+
+// LOGICAL DEPENDENCIES
+import { zodResolver } from "@hookform/resolvers/zod"
+import { Controller, useForm } from "react-hook-form"
+import * as z from "zod"
+
+//CUSTOM FUNCTIONS
 import { Input } from "@/components/ui/input"
+import { signIn, signUp } from "@/server/users"
 
 
-import { signUp } from "@/server/users"
+const formSchema = z.object({
+  email: z.string().trim().pipe(z.email({ message: "Invalid Email Input" })),
+  password: z.string().min(6, { message: "Invalid Password Input" })
+
+
+
+})
+
+
+
+
+
+
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  })
+  function onSubmit(data: z.infer<typeof formSchema>) {
+    signIn(data.email, data.password);
+    console.log("submitted  ")
+  }
+
+
+
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="overflow-hidden p-0">
         <CardContent className="grid p-0 md:grid-cols-2">
-          <form className="p-6 md:p-8">
+
+          <form className="p-6 md:p-8" id="form-rhf-demo" onSubmit={form.handleSubmit(onSubmit)}>
             <FieldGroup>
               <div className="flex flex-col items-center gap-2 text-center">
                 <h1 className="text-2xl font-bold">Welcome back</h1>
@@ -33,27 +73,60 @@ export function LoginForm({
               </div>
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  required
+                <Controller
+                  name="email"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+
+                      <Input
+                        {...field}
+                        id="form-rhf-demo-title"
+                        aria-invalid={fieldState.invalid}
+                        placeholder="user@gmail.com"
+                        autoComplete="off"
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
                 />
               </Field>
               <Field>
                 <div className="flex items-center">
-                  <FieldLabel htmlFor="password">Password</FieldLabel>
-                  <a
-                    href="#"
-                    className="ml-auto text-sm underline-offset-2 hover:underline"
-                  >
-                    Forgot your password?
-                  </a>
+                  <FieldLabel htmlFor="email">Password</FieldLabel>
+
                 </div>
-                <Input id="password" type="password" required />
+                <Controller
+                  name="password"
+                  control={form.control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+
+                      <Input
+                        {...field}
+                        id="form-rhf-demo-title"
+                        aria-invalid={fieldState.invalid}
+                        placeholder="*********"
+                        autoComplete="off"
+                        type="password"
+                      />
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
+                />
+                <a
+                  href="#"
+                  className="ml-auto text-sm underline-offset-2 hover:underline text-right"
+                >
+                  Forgot your password?
+                </a>
               </Field>
               <Field>
-                <Button type="button" onClick={signUp}>
+                <Button type="submit">
                   Login
                 </Button>
               </Field>
