@@ -92,7 +92,8 @@ export function LoginForm({
                         {...field}
                         id="form-rhf-demo-title"
                         aria-invalid={fieldState.invalid}
-                        placeholder="user@gmail.com"
+                        disabled={isLoading}
+                        placeholder={isLoading ? "Verifying Email..." : "user@gmail.com"}
                         autoComplete="off"
                       />
                       {fieldState.invalid && (
@@ -117,7 +118,8 @@ export function LoginForm({
                         {...field}
                         id="form-rhf-demo-title"
                         aria-invalid={fieldState.invalid}
-                        placeholder="*********"
+                        disabled={isLoading}
+                        placeholder={isLoading ? "Verifying Password..." : "*********"}
                         autoComplete="off"
                         type="password"
                       />
