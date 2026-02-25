@@ -1,5 +1,7 @@
 "use server";
 import { auth } from "@/lib/auth"
+import { success } from "zod";
+import { toast } from "sonner"
 
 export const signIn = async (email: string, password: string) => {
     try {
@@ -10,11 +12,19 @@ export const signIn = async (email: string, password: string) => {
             }
 
         })
-        // console.log("LOGGGED IN")
+
+        return {
+            success: true,
+            message: "Signed in successfully"
+        }
 
     } catch (error) {
+        const e = error as Error
+        return {
+            success: false,
+            message: e.message || "Unknown Error Occured"
+        }
 
-        throw (error)
     }
 }
 

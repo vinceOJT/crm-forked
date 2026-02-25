@@ -21,18 +21,15 @@ import * as z from "zod"
 //CUSTOM FUNCTIONS
 import { Input } from "@/components/ui/input"
 import { signIn, signUp } from "@/server/users"
+import { toast } from "sonner";
+import { router } from "better-auth/api";
+import { useRouter } from "next/navigation";
 
 
 const formSchema = z.object({
   email: z.string().trim().pipe(z.email({ message: "Invalid Email Input" })),
   password: z.string().min(6, { message: "Invalid Password Input" })
-
-
-
 })
-
-
-
 
 
 
@@ -42,7 +39,7 @@ export function LoginForm({
   ...props
 }: React.ComponentProps<"div">) {
 
-
+  const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -50,9 +47,15 @@ export function LoginForm({
       password: "",
     },
   })
-  function onSubmit(data: z.infer<typeof formSchema>) {
-    signIn(data.email, data.password);
-    console.log("submitted  ")
+  async function onSubmit(data: z.infer<typeof formSchema>) {
+    const { success, message } = await signIn(data.email, data.password);
+    if (success) {
+      toast.success(message as String);
+      router.push("/dashboard")
+    } else {
+      toast.error(message as String);
+    }
+
   }
 
 
